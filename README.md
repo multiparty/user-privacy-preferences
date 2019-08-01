@@ -1,7 +1,7 @@
 # User Privacy Preferences
 Prototype application that allows users to receive privacy profile policy/configuration recommendations in a privacy-preserving way.
 
-## Installation
+## Installation and Setup
 
 The client and server side mpc is written entirely in JavaScript.  Running the server requires [Node](https://nodejs.org/en/), [npm](https://www.npmjs.com/) and the [JIFF Library](https://github.com/multiparty/jiff/).
 
@@ -9,6 +9,7 @@ Run npm to install JIFF inside the `jiff` directory:
 ```shell
 npm install --prefix jiff
 ```
+Minimal dummy user data is already provided as shares.json in the server directories.  If wanted, it is okay to clear this and accumulate new shares from scratch.
 
 ## Project Layout
 
