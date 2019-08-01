@@ -16,16 +16,16 @@ Minimal dummy user data is already provided as shares.json in the server directo
     ├─ jiff/          Alias to JIFF library dependency
     ├─ server1/       Main clustering server root
     │  └─ public/       Web directory for hosting the server control panel
-    ├─ server1/       Secondary clustering server root
+    ├─ server2/       Secondary clustering server root
     │  └─ public/       Web directory for user preference interface
 
 ## Running the Prototype
 
 ### As a Server
-Start each server from its directory with the command:
+Start each server from its directory with the command below and specify a port number such as:
 ```shell
-node server1/server.js  # Server 1 (and control panel)
-node server2/server.js  # Server 2 (and preference UI)
+node server1/server.js 80  # Server 1 (and control panel)
+node server2/server.js 81  # Server 2 (and preference UI)
 ```
 In a real deployment environment, these directories would be instances run on separate machines, but for testing purposes they can be run both on localhost on the same machine.
 
