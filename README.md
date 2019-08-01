@@ -3,7 +3,7 @@ Prototype application that allows users to receive privacy profile policy/config
 
 ## Installation
 
-The client and server side mpc is written entirely in JavaScript.  Running the server requires [Node](https://nodejs.org/en/), [npm](https://www.npmjs.com/) and [the JIFF Library](https://github.com/multiparty/jiff).
+The client and server side mpc is written entirely in JavaScript.  Running the server requires [Node](https://nodejs.org/en/), [npm](https://www.npmjs.com/) and the [JIFF Library](https://github.com/multiparty/jiff/).
 
 Run npm to install JIFF inside the `jiff` directory:
 ```shell
@@ -24,8 +24,9 @@ npm install --prefix jiff
 Start each server from its directory with the command:
 ```shell
 node server1/server.js  # Server 1 (and control panel)
-node server1/server.js  # Server 2 (and preference UI)
+node server2/server.js  # Server 2 (and preference UI)
 ```
+In a real deployment environment, these directories would be instances run on separate machines, but for testing purposes they can be run both on localhost on the same machine.
 
 ### As a User
 Users can go to `http(s)://server2address:80/client.html` in a web browser supporting JavaScript to input and receive recommendations.
