@@ -24,8 +24,8 @@ Minimal dummy user data is already provided as shares.json in the server directo
 ### As a Server
 Start each server from its directory with the command below and specify a port number such as:
 ```shell
-node server1/server.js 80  # Server 1 (and control panel)
-node server2/server.js 81  # Server 2 (and preference UI)
+node start server1 80  # Server 1 (and control panel)
+node start server2 81  # Server 2 (and preference UI)
 ```
 In a real deployment environment, these directories would be instances run on separate machines, but for testing purposes they can be run both on localhost on the same machine.
 
