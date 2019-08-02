@@ -2,21 +2,21 @@ var express = require('express');
 var app = express();
 
 // Serve static files.
-app.use('/demos/k-means', express.static('demos/k-means/server2/public'));
-app.use('/lib', express.static('lib'));
-app.use('/lib/ext', express.static('lib/ext'));
-console.log('Direct your browser to *:8288/demos/k-means/client.html.\n');
+app.use('/', express.static('server2/public'));
+app.use('/lib', express.static('../jiff/lib'));
+app.use('/lib/ext', express.static('../jiff/lib/ext'));
+console.log('Direct your browser to *:8288/client.html.\n');
 
 // (submission) server jiff instance
 var http = require('http').Server(app);
-require('../../../lib/jiff-server').make_jiff(http, {logs:true});
+require('../jiff/lib/jiff-server').make_jiff(http, {logs:true});
 http.listen(8288, function () {
   console.log('listening on *:8288');
 });
 
 // (recommendation) server jiff instance
 var http2 = require('http').Server(require('express')());
-require('../../../lib/jiff-server').make_jiff(http2, {logs:true});
+require('../jiff/lib/jiff-server').make_jiff(http2, {logs:true});
 http2.listen(8289, function () { console.log('listening on *:8289'); });
 
 var t1;  // benchmark timestamps

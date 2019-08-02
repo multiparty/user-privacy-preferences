@@ -3,24 +3,24 @@ var app = express();
 var http = require('http').Server(app);
 
 // Serve static files.
-app.use('/demos/k-means', express.static('demos/k-means/server1/public'));
-app.use('/lib', express.static('lib'));
-app.use('/lib/ext', express.static('lib/ext'));
+app.use('/', express.static('server1/public'));
+app.use('/lib', express.static('../jiff/lib'));
+app.use('/lib/ext', express.static('../jiff/lib/ext'));
 
-console.log('Direct your browser to *:8082/demos/k-means/controls.html.\n');
+console.log('Direct your browser to *:8082/controls.html.\n');
 
 // (controls) server jiff instance
-require('../../../lib/jiff-server').make_jiff(http, {logs:true});
+require('../jiff/lib/jiff-server').make_jiff(http, {logs:true});
 http.listen(8082, function () { console.log('listening on *:8082'); });
 
 // (submission) server jiff instance
 var http2 = require('http').Server(require('express')());
-require('../../../lib/jiff-server').make_jiff(http2, {logs:true});
+require('../jiff/lib/jiff-server').make_jiff(http2, {logs:true});
 http2.listen(8084, function () { console.log('listening on *:8084'); });
 
 // (clustering) server jiff instance
 var http3 = require('http').Server(require('express')());
-require('../../../lib/jiff-server').make_jiff(http3, {logs:true});
+require('../jiff/lib/jiff-server').make_jiff(http3, {logs:true});
 http3.listen(8086, function () { console.log('listening on *:8086'); });
 
 /***** Set up local compute parties *****/
