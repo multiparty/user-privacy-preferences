@@ -18,7 +18,7 @@ function connect() {
         $('#compareBtn1').prop('disabled', true);
     } else {
         // Server 1 connection
-        jiff_instance = mpc.connect('http://128.31.27.105:8082', 'undefined', {
+        jiff_instance = mpc.connect('http://'+window.location.hostname+':8082', 'undefined', {
             party_id: 2,
             party_count: 2,
             Zp: null,
@@ -66,5 +66,5 @@ function reset() {
 }
 
 function printProfiles() {
-    $.getJSON('http://128.31.27.105:8082/demos/k-means/profiles.json', function(data){printMeans(data, 1, data.length)});
+    $.getJSON('http://'+window.location.hostname+':8082/demos/k-means/profiles.json', function(data){printMeans(data, 1, data.length)});
 }
