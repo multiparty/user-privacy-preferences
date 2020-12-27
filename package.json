@@ -1,0 +1,25 @@
+{
+  "name": "user-privacy-preferences",
+  "version": "1.0.0",
+  "description": "Prototype application that allows users to receive privacy profile policy/configuration recommendations in a privacy-preserving way.",
+  "main": "start.js",
+  "dependencies": {
+    "app-module-path": "^2.2.0",
+    "express": "^4.17.1",
+    "minimist": "^1.2.5"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/multiparty/user-privacy-preferences.git"
+  },
+  "author": "",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/multiparty/user-privacy-preferences/issues"
+  },
+  "homepage": "https://github.com/multiparty/user-privacy-preferences#readme"
+}

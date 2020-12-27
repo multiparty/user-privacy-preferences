@@ -10,12 +10,12 @@
 
         if (node) {
             // eslint-disable-next-line no-undef
-            jiff = require('../../../../lib/jiff-client');
+            JIFFClient = require('../../jiff/dist/jiff-client.js');
             $ = require('jquery-deferred');
         }
 
         // eslint-disable-next-line no-undef
-        saved_instance = jiff.make_jiff(hostname, computation_id, opt);
+        saved_instance = new JIFFClient(hostname, computation_id, opt);
         // if you need any extensions, put them here
 
         return saved_instance;
@@ -53,7 +53,7 @@
         // /**/ r = 2;   // number of rounds iterations
         // /**/ k = 2;   // "k" means
         // /**/ l = 10;  // number of data points
-        // /**/ dim = 7;  // dimentions per points
+        // /**/ dim = 7;  // dimensions per points
         // /* **************** */
         console.log("/* CLUSTER PARAM OVERRIDES: */\n/**/ r = "+r+";   // number of rounds iterations\n/**/ k = "+k+";   // \"k\" means\n/**/ l = "+l+";  // number of data points\n/**/ dim = "+dim+";  // dimentions per points\n");
         var means = Array.from({length: k}, a => []);
@@ -87,7 +87,7 @@
 
             // Assign clusters
             for (var j = 0; j < l; j++) {
-                console.log("Proccessing point "+j);
+                console.log("Processing point "+j);
 
                 // compare each point to each mean
                 let distance = [];

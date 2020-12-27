@@ -1,23 +1,28 @@
+var path = require('path');
 var express = require('express');
 var app = express();
 
 // Serve static files.
-app.use('/', express.static('server2/public'));
-app.use('/lib', express.static('../jiff/lib'));
-app.use('/lib/ext', express.static('../jiff/lib/ext'));
+app.use('/', express.static(path.join(__dirname, 'public')));
+app.use('/dist', express.static(path.join(__dirname, '..', 'jiff', 'dist')));
+app.use('/lib/ext', express.static(path.join(__dirname, '..', 'jiff', 'lib', 'ext')));
 console.log('Direct your browser to *:8288/client.html.\n');
+
+var JIFFServer = require('../jiff/lib/jiff-server.js');
 
 // (submission) server jiff instance
 var http = require('http').Server(app);
-require('../jiff/lib/jiff-server').make_jiff(http, {logs:true});
+new JIFFServer(http, {logs: true});
 http.listen(8288, function () {
   console.log('listening on *:8288');
 });
 
 // (recommendation) server jiff instance
 var http2 = require('http').Server(require('express')());
-require('../jiff/lib/jiff-server').make_jiff(http2, {logs:true});
-http2.listen(8289, function () { console.log('listening on *:8289'); });
+new JIFFServer(http2, {logs: true, crypto_provider: true});
+http2.listen(8289, function () {
+    console.log('listening on *:8289');
+});
 
 var t1;  // benchmark timestamps
 var t2;
@@ -28,6 +33,7 @@ var mpc = require('./public/mpc');
 const fs = require('fs');
 
 var jiff_client_submit = mpc.connect('http://localhost:8288', 'undefined', {
+    crypto_provider: true,
     party_count: 20,
     Zp: null,
     party_id: 1,
@@ -62,6 +68,7 @@ var jiff_client_submit = mpc.connect('http://localhost:8288', 'undefined', {
 var jiff_client_recommend = null;
 function jiff_rec_init() {
     return mpc.connect('http://localhost:8289', 'undefined', {
+        crypto_provider: true,
         party_count: 2,
         Zp: 13,
         listeners: {
@@ -78,6 +85,7 @@ function jiff_rec_init() {
 jiff_client_recommend = jiff_rec_init();
 
 var jiff_other_server = mpc.connect('http://localhost:8086', 'undefined', {
+    crypto_provider: true,
     party_count: 2,
     Zp: 229,
     party_id: 2,
@@ -104,7 +112,7 @@ var means = [];
 var k = 5;  // k-Means
 var r = 2;  // r rounds
 var l = 10;  // data points
-var dim = 10;  // dimentions
+var dim = 10;  // dimensions
 var benchmarktype = "default";
 
 // Begin Clustering
@@ -194,6 +202,7 @@ function reset() {
     // jiff_other_server.disconnect(true, true, function () {
     console.log("has disconnected");
         jiff_other_server = mpc.connect('http://localhost:8086', 'undefined', {
+            crypto_provider: true,
             party_count: 2,
             Zp: 229,
             party_id: 2,

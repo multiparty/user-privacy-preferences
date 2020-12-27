@@ -9,7 +9,6 @@ function connect() {
     $('#connectButton').prop('disabled', true);
     $('#resetButton').prop('disabled', false);
     $('#compareBtn1').prop('disabled', false);
-    var computation_id = $('#computation_id').val();
     var party_count = 2;
 
     if (isNaN(party_count)) {
@@ -19,6 +18,7 @@ function connect() {
     } else {
         // Server 1 connection
         jiff_instance = mpc.connect('http://'+window.location.hostname+':8082', 'undefined', {
+            crypto_provider: true,
             party_id: 2,
             party_count: 2,
             Zp: null,
@@ -66,5 +66,5 @@ function reset() {
 }
 
 function printProfiles() {
-    $.getJSON('http://'+window.location.hostname+':8082/demos/k-means/profiles.json', function(data){printMeans(data, 1, data.length)});
+    $.getJSON('http://'+window.location.hostname+':8082/profiles.json', function(data){printMeans(data, 1, data.length)});
 }

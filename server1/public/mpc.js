@@ -10,12 +10,12 @@
 
         if (node) {
             // eslint-disable-next-line no-undef
-            jiff = require('../../../../lib/jiff-client');
+            JIFFClient = require('../../jiff/lib/jiff-client.js');
             $ = require('jquery-deferred');
         }
 
         // eslint-disable-next-line no-undef
-        saved_instance = jiff.make_jiff(hostname, computation_id, opt);
+        saved_instance = new JIFFClient(hostname, computation_id, opt);
         // if you need any extensions, put them here
 
         return saved_instance;

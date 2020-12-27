@@ -12,6 +12,7 @@ function connectServer(n, port, size = max_parties, p = null, onConnect) {
         port = ['8080', '8084', '8288', '8289'][n];
     }
     jiff_servers[n] = mpc.connect('http://'+window.location.hostname+':'+port, 'undefined', {
+        crypto_provider: true,
         party_count: size,
         Zp: p,
         listeners: {
