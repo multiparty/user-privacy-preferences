@@ -1,38 +1,28 @@
 var path = require('path');
 var express = require('express');
 var app = express();
+var http = require('http').Server(app);
 
 // Serve static files.
 app.use('/', express.static(path.join(__dirname, 'public')));
 app.use('/dist', express.static(path.join(__dirname, '..', 'jiff', 'dist')));
 app.use('/lib/ext', express.static(path.join(__dirname, '..', 'jiff', 'lib', 'ext')));
-console.log('Direct your browser to *:8288/client.html.\n');
+console.log('Direct your browser to *:3002/client.html.\n');
 
 var JIFFServer = require('../jiff/lib/jiff-server.js');
 
-// (submission) server jiff instance
-var http = require('http').Server(app);
+// (submission, recommendation) server jiff instance
 new JIFFServer(http, {logs: true});
-http.listen(8288, function () {
-  console.log('listening on *:8288');
-});
+http.listen(3002, function () { console.log('listening on *:3002'); });
 
-// (recommendation) server jiff instance
-var http2 = require('http').Server(require('express')());
-new JIFFServer(http2, {logs: true, crypto_provider: true});
-http2.listen(8289, function () {
-    console.log('listening on *:8289');
-});
-
-var t1;  // benchmark timestamps
-var t2;
+var t1, t2;  // benchmark timestamps
 
 /***** Set up local compute parties *****/
 
 var mpc = require('./public/mpc');
 const fs = require('fs');
 
-var jiff_client_submit = mpc.connect('http://localhost:8288', 'undefined', {
+var jiff_client_submit = mpc.connect('http://localhost:3001', 'submission', {
     crypto_provider: true,
     party_count: 20,
     Zp: null,
@@ -67,9 +57,9 @@ var jiff_client_submit = mpc.connect('http://localhost:8288', 'undefined', {
 
 var jiff_client_recommend = null;
 function jiff_rec_init() {
-    return mpc.connect('http://localhost:8289', 'undefined', {
+    return mpc.connect('http://localhost:3001', 'recommendation', {
         crypto_provider: true,
-        party_count: 2,
+        party_count: 20,
         Zp: 13,
         listeners: {
             "log": function (sender, message) { console.log(sender, message); },
@@ -84,7 +74,7 @@ function jiff_rec_init() {
 }
 jiff_client_recommend = jiff_rec_init();
 
-var jiff_other_server = mpc.connect('http://localhost:8086', 'undefined', {
+var jiff_other_server = mpc.connect('http://localhost:3001', 'clustering', {
     crypto_provider: true,
     party_count: 2,
     Zp: 229,
@@ -201,7 +191,7 @@ function reset() {
     jiff_other_server.disconnect(false, true);
     // jiff_other_server.disconnect(true, true, function () {
     console.log("has disconnected");
-        jiff_other_server = mpc.connect('http://localhost:8086', 'undefined', {
+        jiff_other_server = mpc.connect('http://localhost:3001', 'clustering', {
             crypto_provider: true,
             party_count: 2,
             Zp: 229,

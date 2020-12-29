@@ -6,12 +6,12 @@ var Zp = 13;
 var jiff_servers = {1: null, 2: null};
 
 const max_parties = 20;
-function connectServer(n, port, size = max_parties, p = null, onConnect) {
+function connectServer(n, computation_id = "nil_computation", port, size = max_parties, p = null, onConnect) {
     disconnectServer(n);  // reconnect if already connected
     if (port == null) {
-        port = ['8080', '8084', '8288', '8289'][n];
+        port = ['3001', '3002'][n-1];
     }
-    jiff_servers[n] = mpc.connect('http://'+window.location.hostname+':'+port, 'undefined', {
+    jiff_servers[n] = mpc.connect('http://'+window.location.hostname+':'+port, computation_id, {
         crypto_provider: true,
         party_count: size,
         Zp: p,
@@ -56,8 +56,8 @@ function set(id) {
 function submit() {
     $('#submitBtn').attr('disabled', true);
 
-    connectServer(1);
-    connectServer(2);
+    connectServer(1, 'submission');
+    connectServer(2, 'submission');
 
     // Split each privacy preference into secret shares
     var shares = {1: [], 2:[]};
@@ -81,10 +81,10 @@ function submit() {
 function compare() {
     $('#compareBtn').attr('disabled', true);
 
-    disconnectServer(3);
+    disconnectServer(1);
 
     // Server 2 with Zp = 13
-    connectServer(3, null, 2, Zp, function () {
+    connectServer(1, "recommendation", null, 20, Zp, function () {
         // Begin MPC comparison
         for (var j = 1; j <= profilesCount; j++) {
             for (var i = 1; i <= prefCount; i++) {
@@ -109,11 +109,11 @@ function handleResult(pref_index, party_index, unset = false, result) {
     console.log("pref_index: " + pref_index);
     console.log("result: " + result);
     console.log("unset: " + unset);
-    if (pref_index == 1) {
+    if (pref_index === 1) {
         similarities[party_index] = 0;
     }
     if (unset) {
-        if (party_index == 1) {
+        if (party_index === 1) {
             unsetPrefs.push(pref_index);
         }
         result = -1;
@@ -126,9 +126,9 @@ function handleResult(pref_index, party_index, unset = false, result) {
     var color = result === 1 ? "lightGreen" : result === 0 ? "lightCoral" : "yellow";
     document.getElementById(""+pref_index).setAttribute("style", "background-color: " + color);
 
-    if (pref_index == prefCount) {
-        $('#output').append('<span>Party #' + party_index + ' has ' + similarities[party_index] + ' preferences in common.</span><br><br>');
-        if (party_index == profilesCount) {
+    if (pref_index === prefCount) {
+        $('#output').append('<span>Profile #' + party_index + ' has ' + similarities[party_index] + ' preferences in common.</span><br><br>');
+        if (party_index === profilesCount) {
             $.getJSON('profiles.json', function(data){recommend(data)});
         }
     }
@@ -136,14 +136,14 @@ function handleResult(pref_index, party_index, unset = false, result) {
 
 function recommend(data) {
     var nearestNeighbor = similarities.indexOf(Math.max(...similarities));  // partyIndex
-    $('#output').append("<span>The nearest neighbor is Party #" + nearestNeighbor + " with " + similarities[nearestNeighbor] + " preferences in common.</span><br>");
-    var recomendations = data[nearestNeighbor - 1];
+    $('#output').append("<span>The nearest neighbor is Profile #" + nearestNeighbor + " with " + similarities[nearestNeighbor] + " preferences in common.</span><br>");
+    var recommendations = data[nearestNeighbor - 1];
     for (var i = 0; i < unsetPrefs.length; i++) {
-        console.log("Pref #"+unsetPrefs[i]+" is suggested to be " + recomendations[unsetPrefs[i]] + ".");
-        $('#output').append("<span>Suggest preference #" + unsetPrefs[i] + " to be " + recomendations[unsetPrefs[i]] + ".</span><br>");
-        document.getElementById("set" + unsetPrefs[i]).innerHTML = "&nbsp;&nbsp;&nbsp;&nbsp;(Suggested: " + recomendations[unsetPrefs[i]] + ")";
+        console.log("Pref #"+unsetPrefs[i]+" is suggested to be " + recommendations[unsetPrefs[i]] + ".");
+        $('#output').append("<span>Suggest preference #" + unsetPrefs[i] + " to be " + recommendations[unsetPrefs[i]] + ".</span><br>");
+        document.getElementById("set" + unsetPrefs[i]).innerHTML = "&nbsp;&nbsp;&nbsp;&nbsp;(Suggested: " + recommendations[unsetPrefs[i]] + ")";
     }
     // disconnect();
-    disconnectServer(3);
+    disconnectServer(1);
     console.log("recommendation completed");
 }

@@ -21,7 +21,6 @@
         return saved_instance;
     };
 
-
     exports.computeComparison = function (input, flag, jiff_instance) {
         if (jiff_instance == null) {
             jiff_instance = saved_instance;
@@ -53,9 +52,9 @@
         // /**/ r = 2;   // number of rounds iterations
         // /**/ k = 2;   // "k" means
         // /**/ l = 10;  // number of data points
-        // /**/ dim = 7;  // dimentions per points
+        // /**/ dim = 7;  // dimensions per points
         // /* **************** */
-        console.log("/* CLUSTER PARAM OVERRIDES: */\n/**/ r = "+r+";   // number of rounds iterations\n/**/ k = "+k+";   // \"k\" means\n/**/ l = "+l+";  // number of data points\n/**/ dim = "+dim+";  // dimentions per points\n");
+        console.log("/* CLUSTER PARAM OVERRIDES: */\n/**/ r = "+r+";   // number of rounds iterations\n/**/ k = "+k+";   // \"k\" means\n/**/ l = "+l+";  // number of data points\n/**/ dim = "+dim+";  // dimensions per points\n");
         var means = Array.from({length: k}, a => []);
         for (var i = 0; i < k; i++) {
             for (var d = 0; d < dim; d++) {
@@ -87,7 +86,7 @@
 
             // Assign clusters
             for (var j = 0; j < l; j++) {
-                console.log("Proccessing point "+j);
+                console.log("Processing point "+j);
 
                 // compare each point to each mean
                 let distance = [];
@@ -149,4 +148,5 @@
         });
         return final_promise;
     };
+
 }((typeof exports === 'undefined' ? this.mpc = {} : exports), typeof exports !== 'undefined'));

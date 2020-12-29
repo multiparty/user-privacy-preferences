@@ -2,36 +2,26 @@ var path = require('path');
 var express = require('express');
 var app = express();
 var http = require('http').Server(app);
-var http2 = require('http').Server(require('express')());
-var http3 = require('http').Server(require('express')());
 
 // Serve static files.
 app.use('/', express.static(path.join(__dirname, 'public')));
 app.use('/dist', express.static(path.join(__dirname, '..', 'jiff', 'dist')));
 app.use('/lib/ext', express.static(path.join(__dirname, '..', 'jiff', 'lib', 'ext')));
 
-console.log('Direct your browser to *:8082/controls.html.\n');
+console.log('Direct your browser to *:3001/controls.html.\n');
 
 var JIFFServer = require('../jiff/lib/jiff-server.js');
 
-// (controls) server jiff instance
+// (controls submission clustering) server jiff instance
 new JIFFServer(http, { logs: true });
-http.listen(8082, function () { console.log('listening on *:8082'); });
-
-// (submission) server jiff instance
-new JIFFServer(http2, {logs: true});
-http2.listen(8084, function () { console.log('listening on *:8084'); });
-
-// (clustering) server jiff instance
-new JIFFServer(http3, {logs: true});
-http3.listen(8086, function () { console.log('listening on *:8086'); });
+http.listen(3001, function () { console.log('listening on *:3001'); });
 
 /***** Set up local compute parties *****/
 
 var mpc = require('./public/mpc');
 const fs = require('fs');
 
-var jiff_client_submit = mpc.connect('http://localhost:8084', 'undefined', {
+var jiff_client_submit = mpc.connect('http://localhost:3002', 'submission', {
     crypto_provider: true,
     party_count: 20,
     Zp: null,
@@ -66,7 +56,7 @@ var jiff_client_submit = mpc.connect('http://localhost:8084', 'undefined', {
 
 var clustering = false;
 var jiff_other_server = null;
-var jiff_control_panel = mpc.connect('http://localhost:8082', 'undefined', {
+var jiff_control_panel = mpc.connect('http://localhost:3002', 'clustering', {
     crypto_provider: true,
     party_count: 2,
     Zp: null,
@@ -78,7 +68,7 @@ var jiff_control_panel = mpc.connect('http://localhost:8082', 'undefined', {
             if (jiff_other_server == null && clustering == false) {
                 clustering = true;
                 console.log("connecting other server");
-                jiff_other_server = mpc.connect('http://localhost:8086', 'undefined', {
+                jiff_other_server = mpc.connect('http://localhost:3002', 'clustering', {
                     crypto_provider: true,
                     party_count: 2,
                     Zp: 229,
@@ -107,7 +97,7 @@ var jiff_control_panel = mpc.connect('http://localhost:8082', 'undefined', {
     onConnect: function () {
         console.log("onConnect");
         console.log("connecting other server");
-        jiff_other_server = mpc.connect('http://localhost:8086', 'undefined', {
+        jiff_other_server = mpc.connect('http://localhost:3002', 'clustering', {
             crypto_provider: true,
             party_count: 2,
             Zp: 229,

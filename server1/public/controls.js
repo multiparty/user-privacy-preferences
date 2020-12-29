@@ -17,7 +17,7 @@ function connect() {
         $('#compareBtn1').prop('disabled', true);
     } else {
         // Server 1 connection
-        jiff_instance = mpc.connect('http://'+window.location.hostname+':8082', 'undefined', {
+        jiff_instance = mpc.connect('http://'+window.location.hostname+':3001', 'clustering', {
             crypto_provider: true,
             party_id: 2,
             party_count: 2,
@@ -66,5 +66,5 @@ function reset() {
 }
 
 function printProfiles() {
-    $.getJSON('http://'+window.location.hostname+':8082/profiles.json', function(data){printMeans(data, 1, data.length)});
+    $.getJSON('http://'+window.location.hostname+':3001/profiles.json', function(data){printMeans(data, 1, data.length)});
 }

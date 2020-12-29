@@ -2,15 +2,15 @@
     var saved_instance;
 
     /**
-    * Connect to the server and initialize the jiff instance
-    */
+     * Connect to the server and initialize the jiff instance
+     */
     exports.connect = function (hostname, computation_id, options) {
         var opt = Object.assign({}, options);
         // Added options goes here
 
         if (node) {
             // eslint-disable-next-line no-undef
-            JIFFClient = require('../../jiff/dist/jiff-client.js');
+            JIFFClient = require('../../jiff/lib/jiff-client.js');
             $ = require('jquery-deferred');
         }
 
@@ -20,7 +20,6 @@
 
         return saved_instance;
     };
-
 
     exports.computeComparison = function (input, flag, jiff_instance) {
         if (jiff_instance == null) {
@@ -55,7 +54,7 @@
         // /**/ l = 10;  // number of data points
         // /**/ dim = 7;  // dimensions per points
         // /* **************** */
-        console.log("/* CLUSTER PARAM OVERRIDES: */\n/**/ r = "+r+";   // number of rounds iterations\n/**/ k = "+k+";   // \"k\" means\n/**/ l = "+l+";  // number of data points\n/**/ dim = "+dim+";  // dimentions per points\n");
+        console.log("/* CLUSTER PARAM OVERRIDES: */\n/**/ r = "+r+";   // number of rounds iterations\n/**/ k = "+k+";   // \"k\" means\n/**/ l = "+l+";  // number of data points\n/**/ dim = "+dim+";  // dimensions per points\n");
         var means = Array.from({length: k}, a => []);
         for (var i = 0; i < k; i++) {
             for (var d = 0; d < dim; d++) {
@@ -149,4 +148,5 @@
         });
         return final_promise;
     };
+
 }((typeof exports === 'undefined' ? this.mpc = {} : exports), typeof exports !== 'undefined'));
