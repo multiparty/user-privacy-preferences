@@ -18,9 +18,15 @@ function connectServer(n, computation_id = "nil_computation", port, size = max_p
         listeners: {
             "log": function (sender, message) { console.log(sender, message); }
         },
-        onError: function (error) { console.log(error); },
-        onConnect: function () { console.log("onConnect"); onConnect(); }
+        onError: function (error) {
+            console.log(error);
+        }//,
+        // onConnect: function (jiff) {
+        //     console.log("onConnect"); onConnect(jiff);
+        // }
     });
+    // onConnect(jiff_servers[n]);
+    jiff_servers[n].wait_for(1, onConnect);
     return jiff_servers[n];
 }
 
@@ -36,7 +42,7 @@ function och() {
     document.getElementById("set4").innerHTML = document.getElementById("input_item10").value + "mb";
 }
 
-var profilesCount = 2;  // TODO: get from server
+var profilesCount = 3;  // TODO: get from server
 var prefCount = 10;  // form data (preferences)
 var prefs = [];
 function set(id) {
@@ -84,17 +90,17 @@ function compare() {
     disconnectServer(1);
 
     // Server 2 with Zp = 13
-    connectServer(1, "recommendation", null, 20, Zp, function () {
+    connectServer(2, "recommendation", null, null, Zp, function (jiff) {
         // Begin MPC comparison
         for (var j = 1; j <= profilesCount; j++) {
             for (var i = 1; i <= prefCount; i++) {
                 if (prefs[i] !== undefined) {
                     // eslint-disable-next-line no-undef
-                    var promise = mpc.computeComparison(prefs[i], null, jiff_servers[3]);
+                    var promise = mpc.computeComparison(prefs[i], jiff.id, null, jiff);
                     promise.then(handleResult.bind(null, i, j, false));
                 } else {
                     // eslint-disable-next-line no-undef
-                    var promise = mpc.computeComparison(0, "unset", jiff_servers[3]);
+                    var promise = mpc.computeComparison(0, jiff.id, "unset", jiff);
                     promise.then(handleResult.bind(null, i, j, true));
                 }
             }
@@ -144,6 +150,6 @@ function recommend(data) {
         document.getElementById("set" + unsetPrefs[i]).innerHTML = "&nbsp;&nbsp;&nbsp;&nbsp;(Suggested: " + recommendations[unsetPrefs[i]] + ")";
     }
     // disconnect();
-    disconnectServer(1);
+    disconnectServer(2);
     console.log("recommendation completed");
 }

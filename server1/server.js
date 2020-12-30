@@ -42,7 +42,11 @@ var jiff_client_submit = mpc.connect('http://localhost:3002', 'submission', {
 
                 // Add the new submitted preferences
                 shares.push(point);
-                fs.writeFile(__dirname + '/server_1_shares.json', JSON.stringify(shares), function(err) {if (err) throw err;});
+                fs.writeFile(
+                    __dirname + '/server_1_shares.json',
+                    JSON.stringify(shares, null, 2).split(",\n  [").join(",n[").split(",\n    ").join(", ").split(",n[").join(",\n  [").split("\n    ").join("").split("\n  ]").join("]"),
+                    function(err) { if (err) throw err; }
+                );
             });
 
             console.log("added ", point);
@@ -191,5 +195,5 @@ function meansSave(result) {
     for (var i = 0; i < Math.floor(result.length/10)*10; i++) {
         profiles[Math.floor(i/10)][i%10+1] = Math.floor(result[i]/prefsize[i%10]);
     }
-    fs.writeFile(__dirname + '/public/profiles.json', JSON.stringify(profiles), function(err) {if (err) throw err;});
+    fs.writeFile(__dirname + '/public/profiles.json', JSON.stringify(profiles, null, 2), function(err) {if (err) throw err;});
 }

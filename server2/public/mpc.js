@@ -21,17 +21,17 @@
         return saved_instance;
     };
 
-    exports.computeComparison = function (input, flag, jiff_instance) {
+    exports.computeComparison = function (input, p_id, flag, jiff_instance) {
         if (jiff_instance == null) {
             jiff_instance = saved_instance;
         }
 
         // The MPC implementation should go *HERE*
-        var shares = jiff_instance.share(input); // Both parties will execute this instruction to secret share their preference hashes
-        var equal = shares[1].seq(shares[2]); // Check if shares are equal
+        var shares = jiff_instance.share(input, null, [1, p_id], [1, p_id]); // Both parties will execute this instruction to secret share their preference hashes
+        var equal = shares[1].seq(shares[p_id]); // Check if shares are equal
 
         // Return a promise to the final output(s)
-        return jiff_instance.open(equal);
+        return jiff_instance.open(equal, [1, p_id]);
     };
 
     exports.computeClusters = function (init_means, points_, k = 2, r = 1, l = 10, dim = 10, jiff_instance) {

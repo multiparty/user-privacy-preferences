@@ -43,7 +43,11 @@ var jiff_client_submit = mpc.connect('http://localhost:3001', 'submission', {
 
                 // Add the new submitted preferences
                 shares.push(point);
-                fs.writeFile(__dirname + '/server_2_shares.json', JSON.stringify(shares), function(err) {if (err) throw err;});
+                fs.writeFile(
+                    __dirname + '/server_2_shares.json',
+                    JSON.stringify(shares, null, 2).split(",\n  [").join(",n[").split(",\n    ").join(", ").split(",n[").join(",\n  [").split("\n    ").join("").split("\n  ]").join("]"),
+                    function(err) { if (err) throw err; }
+                );
             });
 
             console.log("added ", point);
@@ -57,15 +61,15 @@ var jiff_client_submit = mpc.connect('http://localhost:3001', 'submission', {
 
 var jiff_client_recommend = null;
 function jiff_rec_init() {
-    return mpc.connect('http://localhost:3001', 'recommendation', {
+    return mpc.connect('http://localhost:3002', 'recommendation', {
         crypto_provider: true,
         party_count: 20,
         Zp: 13,
         listeners: {
             "log": function (sender, message) { console.log(sender, message); },
             "compare": function (sender, message) {
-                console.log("comparing");
-                compare();
+                console.log("comparing with user #" + sender);
+                compare(sender);
             }
         },
         onError: function (error) { console.log(error); },
@@ -158,7 +162,7 @@ function printMeans(means_local = means, start = 0, k_local = k) {
 
 // Do preference comparison
 // eslint-disable-next-line no-unused-vars
-function compare() {
+function compare(p_id) {
     // Load preferences profiles
     var user_data = [];
     fs.readFile(__dirname + '/public/profiles.json', (err, data) => {
@@ -168,16 +172,16 @@ function compare() {
         console.log("user_data" + user_data);
 
         /*** Begin MPC Comparison ***/
-        var profilesCount = 2;//user_data.length;
+        var profilesCount = 3;//user_data.length;
         var prefCount = 10;//user_data[0].length;
         for (var j = 1; j <= profilesCount; j++) {
             var prefs = user_data[j-1];
             for (var i = 1; i < prefCount; i++) {
                 // eslint-disable-next-line no-undef
-                var promise = mpc.computeComparison(prefs[i], null, jiff_client_recommend);
-                promise.then(function (res){console.log(res);});
+                var promise = mpc.computeComparison(prefs[i], p_id, null, jiff_client_recommend);
+                promise.then(function (res) { console.log(res); });
             }
-            mpc.computeComparison(prefs[prefCount], null, jiff_client_recommend).then(function (){
+            mpc.computeComparison(prefs[prefCount], p_id, null, jiff_client_recommend).then(function (){
                 console.log("recommendation completed");
                 jiff_client_recommend.disconnect(false, true);
                 jiff_client_recommend = jiff_rec_init();
@@ -223,7 +227,7 @@ function meansSave(result) {
     for (var i = 0; i < Math.floor(result.length/10)*10; i++) {
         profiles[Math.floor(i/10)][i%10+1] = Math.floor(result[i]/prefsize[i%10]);
     }
-    fs.writeFile(__dirname + '/public/profiles.json', JSON.stringify(profiles), function(err) {if (err) throw err;});
+    fs.writeFile(__dirname + '/public/profiles.json', JSON.stringify(profiles, null, 2), function(err) {if (err) throw err;});
 }
 
 function bench(time, name) {
