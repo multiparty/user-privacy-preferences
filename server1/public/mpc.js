@@ -67,11 +67,14 @@
         // Recreate submitted secret shares from JSON file
         var points = Array.from({length: l}, a => []);
         for (var j = 0; j < l; j++) {
+            points_[j].shift();
             for (var d = 0; d < dim; d++) {
-                // console.log(i, d, points_[i][d]);
-                var point_share = jiff_instance.secret_share(
-                    jiff_instance, true, null, points_[j][d],
-                    means[0][0].holders, means[0][0].threshold, means[0][0].Zp
+                console.log(j, d, points_[j][d]);
+                var point_share = new jiff_instance.SecretShare(
+                    points_[j][d] + 0,
+                    means[0][0].holders,
+                    means[0][0].threshold,
+                    means[0][0].Zp
                 );
                 points[j][d] = point_share;
             }
@@ -103,28 +106,25 @@
 
                 // find min distance:  min(distance)
                 let min = distance[0];
-                let cluster_id = jiff_instance.share(0)[1];  // zero
+                let cluster_id = 0;  // zero
                 for (var i = 1; i < k; i++) {
                     let cmp = min.slt(distance[i]);
                     min = cmp.if_else(min, distance[i]);
-
-                    let i_share = jiff_instance.share(i)[1];
-                    cluster_id = cmp.if_else(i_share, cluster_id);
+                    cluster_id = cmp.if_else(i, cluster_id);
                 }
                 points[j][dim] = cluster_id;
             }
 
             // Recalculate means
-            var weight = Array.from({length: k}, a => jiff_instance.share(0)[1]);
-            mean = Array.from({length: k}, a => Array.from({length: l}, a => jiff_instance.share(0)[1]));
+            var weight = Array.from({length: k}, a => 0);
+            mean = Array.from({length: k}, a => Array.from({length: l}, a => 0));
             for (var j = 0; j < l; j++) {
                 for (var i = 0; i < k; i++) {
-                    let i_share = jiff_instance.share(i)[1];
-                    let cmp = points[j][dim].seq(i_share);
+                    let cmp = points[j][dim].ceq(i);
                     for (var d = 0; d < dim; d++) {
-                        mean[i][d] = cmp.if_else(mean[i][d].sadd(points[j][d]),  mean[i][d]);
+                        mean[i][d] = cmp.if_else(points[j][d].add(mean[i][d]),  mean[i][d]);
                     }
-                    weight[i] = cmp.if_else(weight[i].cadd(1), weight[i]);
+                    weight[i] = cmp.add(weight[i]);  // same as: cmp.if_else(weight[i].cadd(1), weight[i])
                 }
             }
             for (var i = 0; i < k; i++) {

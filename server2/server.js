@@ -30,8 +30,18 @@ var jiff_client_submit = mpc.connect('http://localhost:3001', 'submission', {
     listeners: {
         "log": function (sender, message) { console.log(sender, message); },
         "add": function (sender, message) {
-            // TODO: add error catching for message
-            var point = JSON.parse(message);
+            var point = [];
+            try {
+                point = JSON.parse(message);
+                if (point.length <= 1 || point[0] !== null || point[1] == null
+                    || !(typeof(point[1]) === "number") || point[1] > Zp - 1) {
+                    throw new Error("User failed to submit a valid preference profile.");
+                }
+            } catch (err) {
+                console.warn(err);
+                console.log("Ignoring...");
+                jiff_client_submit.emit("error", [sender], point + " not added", false);
+            }
 
             console.log("adding shares to server 2");
 
@@ -195,30 +205,29 @@ function reset() {
     jiff_other_server.disconnect(false, true);
     // jiff_other_server.disconnect(true, true, function () {
     console.log("has disconnected");
-        jiff_other_server = mpc.connect('http://localhost:3001', 'clustering', {
-            crypto_provider: true,
-            party_count: 2,
-            Zp: 229,
-            party_id: 2,
-            listeners: {
-                "log": function (sender, message) { console.log(sender, message); },
-                "cluster": function (sender, message) {
-                    // IF "start":
-                    console.log(sender, message);
-                    jiff_other_server.emit("log", [1], "starting k-means", false);
-                    let params = JSON.parse(message);
-                    k = params[0];
-                    r = params[1];
-                    l = params[2];
-                    dim = params[3];
-                    benchmarktype = params[4];
-                    cluster();
-                }
-            },
-            onError: function (error) { console.log(error); },
-            onConnect: function () { console.log("onReconnect"); }
-        });
-    // });
+    jiff_other_server = mpc.connect('http://localhost:3001', 'clustering', {
+        crypto_provider: true,
+        party_count: 2,
+        Zp: 229,
+        party_id: 2,
+        listeners: {
+            "log": function (sender, message) { console.log(sender, message); },
+            "cluster": function (sender, message) {
+                // IF "start":
+                console.log(sender, message);
+                jiff_other_server.emit("log", [1], "starting k-means", false);
+                let params = JSON.parse(message);
+                k = params[0];
+                r = params[1];
+                l = params[2];
+                dim = params[3];
+                type = params[4];
+                cluster();
+            }
+        },
+        onError: function (error) { console.log(error); },
+        onConnect: function () { console.log("onReconnect"); }
+    });
 }
 
 function meansSave(result) {

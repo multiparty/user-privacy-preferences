@@ -11,29 +11,26 @@ function connect() {
     $('#compareBtn1').prop('disabled', false);
     var party_count = 2;
 
-    if (isNaN(party_count)) {
-        $('#output').append('<p class="error">Party count must be a valid number!</p>');
-        $('#connectButton').prop('disabled', false);
-        $('#compareBtn1').prop('disabled', true);
-    } else {
-        // Server 1 connection
-        jiff_instance = mpc.connect('http://'+window.location.hostname+':3001', 'clustering', {
-            crypto_provider: true,
-            party_id: 2,
-            party_count: 2,
-            Zp: null,
-            listeners: {
-                "log": function (sender, message) { console.log(sender, message); }
-            },
-            onError: function (error) {
-                $('#output').append('<p class="error">'+error+'</p>');
-            },
-            onConnect: function () {
-                $('#connectButton').attr('disabled', true); $('#output').append('<p>All parties Connected!</p>');
-                $('#compareBtn1').prop('disabled', false);
-            }
-        });
-    }
+    $('#connectButton').prop('disabled', false);
+    $('#compareBtn1').prop('disabled', true);
+
+    // Server 1 connection
+    jiff_instance = mpc.connect('http://'+window.location.hostname+':3001', 'controls', {
+        party_id: 2,
+        party_count: 2,
+        Zp: null,
+        listeners: {
+            "log": function (sender, message) { console.log(sender, message); }
+        },
+        onError: function (error) {
+            $('#output').append('<p class="error">'+error+'</p>');
+        },
+        onConnect: function () {
+            $('#connectButton').prop('disabled', true);
+            $('#output').append('<p>All parties Connected!</p>');
+            $('#compareBtn1').prop('disabled', false);
+        }
+    });
 }
 
 // k-Means
@@ -44,7 +41,7 @@ var r = 2;
 
 function submit() {
     // tell server 1 to start k-means
-    jiff_instance.emit("cluster", [1], "cluster", false);
+    jiff_instance.emit("cluster", [1], "[3,1,20,9,\"paramtest\"]", false);
 }
 
 function printMeans(means_local = means, start = 0, k_local = k) {
@@ -66,5 +63,5 @@ function reset() {
 }
 
 function printProfiles() {
-    $.getJSON('http://'+window.location.hostname+':3001/profiles.json', function(data){printMeans(data, 1, data.length)});
+    $.getJSON('http://'+window.location.hostname+':3001/profiles.json', function(data) { printMeans(data, 1, data.length); });
 }

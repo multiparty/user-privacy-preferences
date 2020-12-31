@@ -29,8 +29,18 @@ var jiff_client_submit = mpc.connect('http://localhost:3002', 'submission', {
     listeners: {
         "log": function (sender, message) { console.log(sender, message); },
         "add": function (sender, message) {
-            // TODO: add error catching for message
-            var point = JSON.parse(message);
+            var point = [];
+            try {
+                point = JSON.parse(message);
+                if (point.length <= 1 || point[0] !== null || point[1] == null
+                    || !(typeof(point[1]) === "number") || point[1] > Zp - 1) {
+                    throw new Error("User failed to submit a valid preference profile.");
+                }
+            } catch (err) {
+                console.warn(err);
+                console.log("Ignoring...");
+                jiff_client_submit.emit("error", [sender], point + " not added", false);
+            }
 
             console.log("adding shares to server 1");
 
@@ -60,7 +70,7 @@ var jiff_client_submit = mpc.connect('http://localhost:3002', 'submission', {
 
 var clustering = false;
 var jiff_other_server = null;
-var jiff_control_panel = mpc.connect('http://localhost:3002', 'clustering', {
+var jiff_control_panel = mpc.connect('http://localhost:3001', 'controls', {
     crypto_provider: true,
     party_count: 2,
     Zp: null,
@@ -72,7 +82,7 @@ var jiff_control_panel = mpc.connect('http://localhost:3002', 'clustering', {
             if (jiff_other_server == null && clustering == false) {
                 clustering = true;
                 console.log("connecting other server");
-                jiff_other_server = mpc.connect('http://localhost:3002', 'clustering', {
+                jiff_other_server = mpc.connect('http://localhost:3001', 'clustering', {
                     crypto_provider: true,
                     party_count: 2,
                     Zp: 229,
@@ -98,32 +108,7 @@ var jiff_control_panel = mpc.connect('http://localhost:3002', 'clustering', {
         }
     },
     onError: function (error) { console.log(error); },
-    onConnect: function () {
-        console.log("onConnect");
-        console.log("connecting other server");
-        jiff_other_server = mpc.connect('http://localhost:3002', 'clustering', {
-            crypto_provider: true,
-            party_count: 2,
-            Zp: 229,
-            party_id: 1,
-            listeners: {
-                "log": function (sender, message) { console.log(sender, message); }
-            },
-            onError: function (error) { console.log("try to connect other server | " + error); },
-            onConnect: function () {
-                console.log("onConnect");
-                message = JSON.stringify([3, 1, 20, 9, "paramtest"]);
-                jiff_other_server.emit("cluster", [2], message, false);
-                let params = JSON.parse(message);
-                k = params[0];
-                r = params[1];
-                l = params[2];
-                dim = params[3];
-                cluster();
-                clustering = true;
-            }
-        });
-    }
+    onConnect: function () { console.log("onConnect"); }
 });
 
 
@@ -193,7 +178,7 @@ function meansSave(result) {
     var prefsize = [3, 4, 2, 13, 2, 2, 2, 2, 2, 2];
     var profiles = Array.from({length: Math.floor(result.length/10)}, () => Array.from({length: 11}, () => null));
     for (var i = 0; i < Math.floor(result.length/10)*10; i++) {
-        profiles[Math.floor(i/10)][i%10+1] = Math.floor(result[i]/prefsize[i%10]);
+        profiles[Math.floor(i/10)][i%10+1] = Math.floor(result[i]/prefsize[i%10]);  // TODO: properly clamp/rescale appropriate dimensions
     }
     fs.writeFile(__dirname + '/public/profiles.json', JSON.stringify(profiles, null, 2), function(err) {if (err) throw err;});
 }
